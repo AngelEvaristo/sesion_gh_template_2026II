@@ -9,7 +9,7 @@ on:
         type: string
       source-path:
         description: "Origen de compilado"
-        requiered: true
+        required: true
         type: string
 
 jobs:
