@@ -1,0 +1,45 @@
+name: ReusableWorkflow
+
+on: 
+  workflow_call:
+    inputs:
+      node-version:
+        description: "Version de node"
+        required: true
+        type: string
+      source-path:
+        description: "Origen de compilado"
+        requiered: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set version node
+        uses: actions/setup-node@v4
+        with:
+          node-version : "${{ inputs.node-version }}"
+        
+      - name: Instalar dependencias
+        run: |
+          npm isntall -g @angular/cli
+          npm install
+
+      - name: Compilar
+        run: ng build --configuration production
+
+      - name: Crear zip
+        shell: pwsh
+        run: |
+          Push-Location ${{ inputs.source-path }}
+          Compress-Archive -Path * -DestinationPath $env:GITHUB_WORKSPACE/app.zip        
+
+      - name: Publicar compilado
+        uses: actions/upload-artifact@v4
+        with:
+          name: drop
+          path: app.zip  
+      
